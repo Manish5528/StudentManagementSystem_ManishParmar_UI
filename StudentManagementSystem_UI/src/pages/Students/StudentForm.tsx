@@ -16,21 +16,13 @@ import { useEffect, useState, useCallback } from "react";
 import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import { studentApi } from "../../api/studentApi";
+import { studentApi, type StudentPayload } from "../../api/studentApi";
 import { courseApi } from "../../api/courseApi";
 
 interface ClassType {
   id: string;
   name: string;
   description: string;
-}
-
-export interface StudentPayload {
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-  emailId: string;
-  classIds: string[];
 }
 
 interface StudentFormProps {
@@ -49,7 +41,7 @@ const schema: Yup.ObjectSchema<StudentPayload> = Yup.object({
   emailId: Yup.string()
     .email("Invalid email")
     .required("Email is required"),
-  classIds: Yup.array()
+  courseIds: Yup.array()
     .of(Yup.string().required())
     .min(1, "Select at least one class")
     .required(),
@@ -78,7 +70,7 @@ export default function StudentForm({
       lastName: "",
       phoneNumber: "",
       emailId: "",
-      classIds: [],
+      courseIds: [],
     },
   });
 
@@ -172,12 +164,12 @@ export default function StudentForm({
         <FormControl
           fullWidth
           margin="dense"
-          error={!!errors.classIds}
+          error={!!errors.courseIds}
         >
           <InputLabel id="class-label">Classes</InputLabel>
 
           <Controller
-            name="classIds"
+            name="courseIds"
             control={control}
             render={({ field }) => (
               <Select

@@ -56,7 +56,7 @@ export default function ClassImportModal({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button variant="contained" onClick={handleImport}>
+        <Button variant="contained" onClick={handleImport} disabled={!file}>
           Import
         </Button>
       </DialogActions>

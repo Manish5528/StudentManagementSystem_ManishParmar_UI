@@ -5,7 +5,7 @@ export interface StudentPayload {
   lastName: string;
   phoneNumber: string;
   emailId: string;
-  classIds: string[];
+  courseIds: string[];
 }
 
 export const studentApi = {
