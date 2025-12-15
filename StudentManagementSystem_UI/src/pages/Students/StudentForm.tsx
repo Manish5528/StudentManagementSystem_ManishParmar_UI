@@ -38,16 +38,12 @@ const schema: Yup.ObjectSchema<StudentPayload> = Yup.object({
   phoneNumber: Yup.string()
     .matches(/^\d{10}$/, "Phone number must be exactly 10 digits")
     .required("Phone Number is required"),
-  emailId: Yup.string()
-    .email("Invalid email")
-    .required("Email is required"),
+  emailId: Yup.string().email("Invalid email").required("Email is required"),
   courseIds: Yup.array()
     .of(Yup.string().required())
     .min(1, "Select at least one class")
     .required(),
 });
-
-
 
 export default function StudentForm({
   open,
@@ -114,7 +110,7 @@ export default function StudentForm({
       }
       refresh();
       onClose();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       alert(err?.response?.data?.message || "Something went wrong");
     }
@@ -127,10 +123,12 @@ export default function StudentForm({
       <DialogContent>
         <TextField
           fullWidth
+          
           label="First Name"
           margin="dense"
           {...register("firstName")}
           error={!!errors.firstName}
+          InputLabelProps={{ shrink: true }}
           helperText={errors.firstName?.message}
         />
 
@@ -140,6 +138,7 @@ export default function StudentForm({
           margin="dense"
           {...register("lastName")}
           error={!!errors.lastName}
+          InputLabelProps={{ shrink: true }}
           helperText={errors.lastName?.message}
         />
 
@@ -149,6 +148,7 @@ export default function StudentForm({
           margin="dense"
           {...register("phoneNumber")}
           error={!!errors.phoneNumber}
+          InputLabelProps={{ shrink: true }}
           helperText={errors.phoneNumber?.message}
         />
 
@@ -157,15 +157,12 @@ export default function StudentForm({
           label="Email"
           margin="dense"
           {...register("emailId")}
+          InputLabelProps={{ shrink: true }}
           error={!!errors.emailId}
           helperText={errors.emailId?.message}
         />
 
-        <FormControl
-          fullWidth
-          margin="dense"
-          error={!!errors.courseIds}
-        >
+        <FormControl fullWidth margin="dense" error={!!errors.courseIds}>
           <InputLabel id="class-label">Classes</InputLabel>
 
           <Controller
@@ -173,19 +170,33 @@ export default function StudentForm({
             control={control}
             render={({ field }) => (
               <Select
-                {...field}
                 labelId="class-label"
                 multiple
                 value={field.value ?? []}
+                onChange={(e) => field.onChange(e.target.value)}
                 input={<OutlinedInput label="Classes" />}
-                renderValue={(selected) => (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                    {(selected as string[]).map((id) => {
-                      const cls = classList.find((c) => c.id === id);
-                      return <Chip key={id} label={cls?.name} />;
-                    })}
-                  </div>
-                )}
+                renderValue={(selected) =>
+                  (selected as string[]).length === 0 ? null : (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                      {(selected as string[]).map((id) => {
+                        const cls = classList.find((c) => c.id === id);
+
+                        return (
+                          <Chip
+                            key={id}
+                            label={cls?.name ?? ""}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onDelete={() =>
+                              field.onChange(
+                                (field.value ?? []).filter((x) => x !== id)
+                              )
+                            }
+                          />
+                        );
+                      })}
+                    </div>
+                  )
+                }
               >
                 {classList.map((cls) => (
                   <MenuItem key={cls.id} value={cls.id}>
@@ -195,6 +206,12 @@ export default function StudentForm({
               </Select>
             )}
           />
+
+          {errors.courseIds && (
+            <p style={{ color: "red", margin: "4px 0 0" }}>
+              {errors.courseIds.message}
+            </p>
+          )}
         </FormControl>
       </DialogContent>
 

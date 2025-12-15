@@ -5,13 +5,16 @@ import PrivateRoute from "./routes/PrivateRoute";
 import StudentList from "./pages/Students/StudentList";
 import ClassList from "./pages/Courses/CourseList";
 import { AuthProvider } from "./context/AuthContext";
- 
+
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
+          <Route path="/" element={<Navigate to="/login" replace />} />
+
           <Route path="/login" element={<LoginPage />} />
+
           <Route
             path="/master"
             element={
@@ -24,10 +27,12 @@ function App() {
             <Route path="students" element={<StudentList />} />
             <Route path="classes" element={<ClassList />} />
           </Route>
+
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
   );
 }
- 
+
 export default App;
